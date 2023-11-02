@@ -1,8 +1,14 @@
-% AMME4112 - Thesis B
+%
+% IMU-Based 3D Human Pose Tracking System
 %
 % Author: Aidan Stapleton
-% Date: 012/09/2023
 %
+% Date: 03/10/2023
+%
+% Experiment 2: Panning of the left arm from beside the
+% body to in front of the body and back again. The Y 
+% component of the left wrist position is tracked and
+% compared with stereo vision ground truth data.
 
 % Clear the workspace and command window
 cla;
@@ -10,24 +16,19 @@ clc;
 clear;
 close all;
 
-% Validate data from the right arm moving from the initial position to
-% directly infront of their body with their thumb pointing left.
-
 % Read the data as floating-point numbers
 Data = load('Test1B.txt');
 
 % Define x axis data
 T = linspace(1, length(Data), length(Data));
-%T_gt = linspace(1, length(Data), 10);
 T_gt = [0, 63, 138, 196, 247, 301, 350, 400, 450, 500];
-
-% Define the ground truth for moving the wrist from point 1 to
-% point 8 and then back down to point 1
-% For the current set of data 
 
 % Define the Xcw vector
 Xcw = [-0.3523, 0.3499, 1.2035];
 
+% Unlike experiment 1, coordinate frame rotation was used to align 
+% the camera coordinate frame and the world coordinate frame before
+% inverting the X and Z axes.
 % Define the camera rotation matrix
 theta = 90*(pi/180);
 Rx = [1 0 0; 0 cos(theta) -sin(theta); 0 sin(theta) cos(theta)];
@@ -42,6 +43,7 @@ Xc2 = Xc2*Rx;
 Xcw = Xcw*Rx;
 
 % Invert Z axis
+PolarityX = -1;
 PolarityZ = -1;
 Xc1(3) = Xc1(3)*PolarityZ;
 Xc2(3) = Xc2(3)*PolarityZ;
@@ -54,14 +56,9 @@ DataY = Data(:, 2);
 Xw1 = Xc1 - Xcw;
 Xw2 = Xc2 - Xcw;
 
-GroundTruthY = [0, 0.55];
-
 % Due to depth perception difficulties, we take the x component of 
 % the first point as the Y component for the second point
 SVGroundTruthY = [Xw1(2), Xw2(2)];
-
-% Calculate the errors for Y
-%ErrorX = MatchedY - GroundTruthY;
 
 % Define subsampled data
 DataY1SubSampled = [-0.0058, 0.0052, 0.0113, 0.0102, 0.0003];
@@ -94,8 +91,6 @@ blue = sscanf(str(2:end),'%2x%2x%2x',[1 3])/255;
 hold on;
 plot(T(1:340), DataY(1:340), '-o', 'Color', blue);
 grid on;
-%yline(GroundTruthY(1), 'g');
-%yline(GroundTruthY(2), 'g');
 yline(SVGroundTruthY(1), 'Color', red, 'LABEL', 'Wrist A');
 yline(SVGroundTruthY(2), 'Color', red, 'LABEL', 'Wrist B');
 title("Left Wrist Position Y");
