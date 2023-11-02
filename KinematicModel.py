@@ -1,7 +1,12 @@
+#
+# IMU-Based 3D Human Pose Tracking System
+#
+# Author: Aidan Stapleton
+#
+# Date: 12/10/2023
+#
 # This script reads human pose data from UDP wifi communication protocol and displays 
 # the data as a kinematic model in real time.
-
-# Author: Aidan Stapleton
 
 # Import packages
 import socket
@@ -12,16 +17,16 @@ import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 from pyquaternion import Quaternion
 
-# IMU tracking index
+# Define IMU variables and flags
 Index = 1
-InitialiseIMUCount = 0
 IMUsInUse = 9
+InitialiseIMUCount = 0
+FirstEpochFlag = 1
 
-#localIP     = "192.168.0.127"           # Laptop IP address
-localIP     = "192.168.0.32"           # Desktop IP address
+# Define the local IP address, local port and UDP buffer size
+localIP     = "INSERT HERE"           
 localPort   = 2390
 bufferSize  = 1024
-FirstEpochFlag = 1
 
 # Create a datagram socket
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -46,8 +51,10 @@ ax.set_xlabel("X axis (m)")
 ax.set_ylabel("Y axis (m)")
 ax.set_zlabel("Z axis (m)")
 
+# Define the model colour
 ModelColour = "red"
 
+# Define ax.plot3D vectors for each body part in the kinematic model
 HeadPlot, = ax.plot3D([], [], [], ModelColour)
 UpperTorsoPlot, = ax.plot3D([], [], [], ModelColour, dash_capstyle='round')
 LowerTorsoPlot, = ax.plot3D([], [], [], ModelColour, dash_capstyle='round')
@@ -66,6 +73,7 @@ LeftThighPlot, = ax.plot3D([], [], [], ModelColour)
 LeftLegPlot, = ax.plot3D([], [], [], ModelColour)
 
 # Create and open the file with the intention to read and write
+# (Uncomment when recording results)
 #KneeResults = open("StereoVisionData/Test2ResultsKnee4.txt", "w+")
 #AnkleResults = open("StereoVisionData/Test2ResultsAnkle4.txt", "w+")
 
@@ -95,7 +103,6 @@ def KinematicModelSetup():
     LegLength = 0.42
     ShoulderWidth = 0.31
     WaistWidth = 0.28
-    #LegAngleAtShoulderWidth = 15*(math.pi/180)
 
     # Deine the model origin
     Origin = [0, 0, 0]
@@ -223,6 +230,7 @@ while(True):
     if len(NextData) > 0:
 
         # If the defined StopEpoch epochs have passed, stop the system
+        # (Uncomment when recording results)
         #if Epoch > StopEpoch:
         #    KneeResults.close()
         #    AnkleResults.close()
@@ -461,6 +469,7 @@ while(True):
             CompleteEpochFlag = 0
 
             # Send data to the results file for error tracking
+            # (Uncomment when recording results)
             #KneeResults.write(str(RightLegCoords[0]) + " " + str(RightLegCoords[1]) + " " + str(RightLegCoords[2]) + "\n")
             #AnkleResults.write(str(RightLegCoords[0]+RightLegV[0]) + " " + str(RightLegCoords[1]+RightLegV[1]) + " " + str(RightLegCoords[2]+RightLegV[2]) + "\n")
 
