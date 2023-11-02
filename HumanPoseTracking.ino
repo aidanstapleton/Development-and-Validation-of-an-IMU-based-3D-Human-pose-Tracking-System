@@ -17,11 +17,10 @@
 #include "arduino_secrets.h" 
 
 // Define initial variables
-char ssid[] = "Optus_54B772_EXT";         // Network SSID (name)
-char pass[] = "deedygamey6fHGH";          // Network password (use for WPA, or use as key for WEP)
-//char NetworkIP[] = "192.168.0.127";     // Laptop IP address
-char NetworkIP[] = "192.168.0.32";        // Desktop IP address
-unsigned int localPort = 2390;            // local port to listen on
+char ssid[] = "INSERT HERE";             // Network SSID (name)
+char pass[] = "INSERT HERE";             // Network password (Use for WPA, or use as key for WEP)
+char NetworkIP[] = "INSERT HERE";        // Data receiving PC IP address
+unsigned int localPort = 2390;           // Local port to listen on
 int status = WL_IDLE_STATUS;
 const int Precision = 6;
 const int IMUsInUse = 9;
@@ -155,7 +154,6 @@ void SetupIMU() {
 
   // IMU 1
   TCA9548A(1);
-  //bno1.setAxisRemap(Adafruit_BNO055::REMAP_CONFIG_P1);
   if(!bno1.begin()){
 
     // There was a problem detecting the BNO055
@@ -281,6 +279,7 @@ void SetupIMU() {
 // This loop runs continuously
 void loop(void) {
 
+  // Declare a new IMU sensor event, NextQuat, and NextIMU
   sensors_event_t event;
   imu::Quaternion NextQuat;
   int NextIMU;
@@ -370,6 +369,11 @@ void loop(void) {
   }
 }
 
+// I2CScanner() code sourced from walidamriou on GitHub: 
+// I2C scanner for Arduino, ESP32, ESP8266 ...
+// URL = https://gist.github.com/walidamriou/1e759043d66340f9c76c7d13b6abf55e
+// Accessed on: 02/11/2023
+
 // Function to scan the I2C bus for connected devices
 void I2CScanner(){
 
@@ -422,9 +426,10 @@ void I2CScanner(){
 // Function to display sensor calibration status
 void CalibrateIMU(void){
 
-  /* Get the four calibration values (0..3) */
-  /* Any sensor data reporting 0 should be ignored, */
-  /* 3 means 'fully calibrated" */
+  // Get calibration values for the accelerometer, gyroscope
+  // magnetometer and the IMU.
+  // Not calibrated = 0 (don't use values from these sensors!)
+  // Fully calibrated = 3
 
   Serial.println("Beginning IMU Calibration");
 
@@ -756,21 +761,26 @@ void CalibrateIMU(void){
   }
 }
 
+// PrintWiFiStatus() code sourced from Arduino Documentation: Send and Receive UDP String
+// URL = https://docs.arduino.cc/library-examples/wifi-library/WiFiUdpSendReceiveString
+// Accessed on: 02/11/2023
+
 void PrintWiFiStatus(){
 
-  // Print the SSID of the network you're attached to:
+  // Print the SSID of the network being connected to
   Serial.print("SSID: ");
   Serial.println(WiFi.SSID());
 
-  // Print your WiFi shield's IP address:
+  // Print the IP address of the WiFi shield (ATWINC1500)
   IPAddress ip = WiFi.localIP();
   Serial.print("Local IP Address: ");
   Serial.println(ip);
 
+  // Print the IP address of the PC receiving IMU data
   Serial.print("Remote IP Address: ");
   Serial.println(Udp.remoteIP());
 
-  // Print the received signal strength:
+  // Display the signal strength
   long rssi = WiFi.RSSI();
   Serial.print("signal strength (RSSI):");
   Serial.print(rssi);
