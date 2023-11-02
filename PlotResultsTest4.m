@@ -1,8 +1,15 @@
-% AMME4112 - Thesis B
+%
+% IMU-Based 3D Human Pose Tracking System
 %
 % Author: Aidan Stapleton
-% Date: 012/09/2023
 %
+% Date: 03/10/2023
+%
+% Experiment 4: Elevation of the right leg beside 
+% the body to a 60 degree angle of depression and back
+% again. The X and Z components of the right leg 
+% position is tracked and compared with stereo vision 
+% ground truth data.
 
 % Clear the workspace and command window
 cla;
@@ -10,12 +17,9 @@ clc;
 clear;
 close all;
 
-% Validate data from the right leg moving from the initial position to
-% beside of their body at 60 degrees to the horizontal and back.
-
 % Read the data as floating-point numbers
-KneeData = load('Test3ResultsKnee2.txt');
-AnkleData = load('Test3ResultsAnkle2.txt');
+KneeData = load('Test4KneeData.txt');
+AnkleData = load('Test4AnkleData.txt');
 
 % Define x axis data
 T = linspace(1, length(KneeData), length(KneeData));
@@ -115,7 +119,7 @@ AnkleZ2SubSampled = [-1.0690, -1.0820, -1.0880];
 
 % -------------------------------------- Error ---------------
 
-% Define the erorr subsamples
+% Define the error for each subsubsample
 KneeX1Error = abs(Xw1_Knee(1) - KneeX1SubSampled);
 KneeX2Error = abs(Xw2_Knee(1) - KneeX2SubSampled);
 AnkleX1Error = abs(Xw1_Ankle(1) - AnkleX1SubSampled);
@@ -126,76 +130,25 @@ KneeZ2Error = abs(Xw2_Knee(3) - KneeZ2SubSampled);
 AnkleZ1Error = abs(Xw1_Ankle(3) - AnkleZ1SubSampled);
 AnkleZ2Error = abs(Xw2_Ankle(3) - AnkleZ2SubSampled);
 
-% Define the average error for each point in cm
+% Define the average error for each point in the X axis in cm
 AvgKneeX1Error = (sum(KneeX1Error)/length(KneeX1Error))*10^2;
 AvgKneeX2Error = (sum(KneeX2Error)/length(KneeX2Error))*10^2;
 AvgAnkleX1Error = (sum(AnkleX1Error)/length(AnkleX1Error))*10^2;
 AvgAnkleX2Error = (sum(AnkleX2Error)/length(AnkleX2Error))*10^2;
 
+% Define the average errors in the X axis for each joint
 AvgKneeXError = (AvgKneeX1Error + AvgKneeX2Error)/2;
 AvgAnkleXError = (AvgAnkleX1Error + AvgAnkleX2Error)/2;
 
+% Define the average error for each point in the Z axis in cm
 AvgKneeZ1Error = (sum(KneeZ1Error)/length(KneeZ1Error))*10^2;
 AvgKneeZ2Error = (sum(KneeZ2Error)/length(KneeZ2Error))*10^2;
 AvgAnkleZ1Error = (sum(AnkleZ1Error)/length(AnkleZ1Error))*10^2;
 AvgAnkleZ2Error = (sum(AnkleZ2Error)/length(AnkleZ2Error))*10^2;
 
+% Define the average errors in the Z axis for each joint
 AvgKneeZError = (AvgKneeZ1Error + AvgKneeZ2Error)/2;
 AvgAnkleZError = (AvgAnkleZ1Error + AvgAnkleZ2Error)/2;
-
-% --------------------------------- Accuracy X ----------------------------
-% Calculate the accuracy for the X component of the knee position
-KneeXAccuracyPoint1 = (1 - abs(abs(Xw1_Knee(1) - KneeX1SubSampled)./Xw1_Knee(1)))*100;
-KneeXAccuracyPoint1 = max(KneeXAccuracyPoint1, 0);
-AverageAccuracyKneeX1 = sum(KneeXAccuracyPoint1)/length(KneeXAccuracyPoint1);
-
-KneeXAccuracyPoint2 = (1 - abs(abs(Xw2_Knee(1) - KneeX2SubSampled)./Xw2_Knee(1)))*100;
-KneeXAccuracyPoint2 = max(KneeXAccuracyPoint2, 0);
-AverageAccuracyKneeX2 = sum(KneeXAccuracyPoint2)/length(KneeXAccuracyPoint2);
-
-% Calculate the accuracy for the X component of the ankle position
-AnkleXAccuracyPoint1 = (1 - abs(abs(Xw1_Ankle(1) - AnkleX1SubSampled)./Xw1_Ankle(1)))*100;
-AnkleXAccuracyPoint1 = max(AnkleXAccuracyPoint1, 0);
-AverageAccuracyAnkleX1 = sum(AnkleXAccuracyPoint1)/length(AnkleXAccuracyPoint1);
-
-AnkleXAccuracyPoint2 = (1 - abs(abs(Xw2_Ankle(1) - AnkleX2SubSampled)./Xw2_Ankle(1)))*100;
-AnkleXAccuracyPoint2 = max(AnkleXAccuracyPoint2, 0);
-AverageAccuracyAnkleX2 = sum(AnkleXAccuracyPoint2)/length(AnkleXAccuracyPoint2);
-
-% --------------------------------- Accuracy Z ----------------------------
-% Calculate the accuracy for the Z component of the knee position
-KneeZAccuracyPoint1 = (1 - abs(abs(Xw1_Knee(3) - KneeZ1SubSampled)./Xw1_Knee(3)))*100;
-KneeZAccuracyPoint1 = max(KneeZAccuracyPoint1, 0);
-AverageAccuracyKneeZ1 = sum(KneeZAccuracyPoint1)/length(KneeZAccuracyPoint1);
-
-KneeZAccuracyPoint2 = (1 - abs(abs(Xw2_Knee(3) - KneeZ2SubSampled)./Xw2_Knee(3)))*100;
-KneeZAccuracyPoint2 = max(KneeZAccuracyPoint2, 0);
-AverageAccuracyKneeZ2 = sum(KneeZAccuracyPoint2)/length(KneeZAccuracyPoint2);
-
-% Calculate the accuracy for the Z component of the ankle position
-AnkleZAccuracyPoint1 = (1 - abs(abs(Xw1_Ankle(3) - AnkleZ1SubSampled)./Xw1_Ankle(3)))*100;
-AnkleZAccuracyPoint1 = max(AnkleZAccuracyPoint1, 0);
-AverageAccuracyAnkleZ1 = sum(AnkleZAccuracyPoint1)/length(AnkleZAccuracyPoint1);
-
-AnkleZAccuracyPoint2 = (1 - abs(abs(Xw2_Ankle(3) - AnkleZ2SubSampled)./Xw2_Ankle(3)))*100;
-AnkleZAccuracyPoint2 = max(AnkleZAccuracyPoint2, 0);
-AverageAccuracyAnkleZ2 = sum(AnkleZAccuracyPoint2)/length(AnkleZAccuracyPoint2);
-
-% Display average accuracies
-disp("Average Accuracy Knee X Point 1: " + num2str(AverageAccuracyKneeX1));
-disp("Average Accuracy Knee X Point 2: " + num2str(AverageAccuracyKneeX2));
-
-disp("Average Accuracy Ankle X Point 1: " + num2str(AverageAccuracyAnkleX1));
-disp("Average Accuracy Ankle X Point 2: " + num2str(AverageAccuracyAnkleX2));
-
-disp("Average Accuracy Knee Z Point 1: " + num2str(AverageAccuracyKneeZ1));
-disp("Average Accuracy Knee Z Point 2: " + num2str(AverageAccuracyKneeZ2));
-
-disp("Average Accuracy Ankle Z Point 1: " + num2str(AverageAccuracyAnkleZ1));
-disp("Average Accuracy Ankle Z Point 2: " + num2str(AverageAccuracyAnkleZ2));
-
-KneeColour = 'b';
-AnkleColour = 'r';
 
 % Define colours
 str = '#A8142F';
@@ -212,13 +165,9 @@ plot(T(1:450), KneeDataX(1:450), '-o', 'Color', blue);
 plot(T(1:450), AnkleDataX(1:450), '-o', 'Color', red);
 xlim([0 500]);
 ylim([0.1 0.7]);
-% Plot X measured ground truth
-% yline(KneeGroundTruthX(1), KneeColour);
-% yline(KneeGroundTruthX(2), KneeColour);
-% yline(AnkleGroundTruthX(1), AnkleColour);
-% yline(AnkleGroundTruthX(2), AnkleColour);
 
-% Plot X stereo vision ground truth
+% Plot the stereo vision data in the X axis as horizontals for each point
+% of interest
 yline(Xw1_Knee(1), 'Color', blue, 'LABEL', 'Knee A');
 yline(Xw2_Knee(1), 'Color', blue, 'LABEL', 'Knee B');
 yline(Xw1_Ankle(1), 'Color', red, 'LABEL', 'Ankle A');
@@ -229,6 +178,7 @@ xlabel('Data Sample');
 ylabel('Right Leg Position X (m)');
 legend('Right Knee Position X', 'Right Ankle Position X');
 
+% Plot Z data
 figure;
 hold on;
 plot(T(1:450), KneeDataZ(1:450), '-o', 'Color', blue);
@@ -237,12 +187,8 @@ grid on;
 xlim([0 500]);
 ylim([-1.25 -0.6]);
 
-% yline(KneeGroundTruthZ(1), KneeColour);
-% yline(KneeGroundTruthZ(2), KneeColour);
-% yline(AnkleGroundTruthZ(1), AnkleColour);
-% yline(AnkleGroundTruthZ(2), AnkleColour);
-
-% Plot Z stereo vision ground truth
+% Plot the stereo vision data in the Z axis as horizontals for each point
+% of interest
 yline(Xw1_Knee(3), 'Color', blue, 'LABEL', 'Knee A');
 yline(Xw2_Knee(3), 'Color', blue, 'LABEL', 'Knee B');
 yline(Xw1_Ankle(3), 'Color', red, 'LABEL', 'Ankle A');
