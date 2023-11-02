@@ -1,9 +1,17 @@
-% AMME4112 - Thesis B
+%
+% IMU-Based 3D Human Pose Tracking System
 %
 % Author: Aidan Stapleton
+%
 % Date: 03/10/2023
 %
-% Connect to the pair of Microsoft LifeCam HD-3000s
+% Connect to the pair of Microsoft LifeCam HD-3000s.
+%
+% Calibration:      CameraMode = 0
+%
+% Tracking:         CameraMode = 1
+%
+% Camera Preview:   CameraMode = 2
 
 % Clear the workspace and command window
 cla;
@@ -13,7 +21,7 @@ close all;
 
 % Settings
 NumCalibPairs = 15;
-CameraMode = 0;         % 0 = calibration, 1 = tracking, 2 = preview
+CameraMode = 0;         
 
 % Get an array containing all connected cameras
 cam_List = webcamlist; 
