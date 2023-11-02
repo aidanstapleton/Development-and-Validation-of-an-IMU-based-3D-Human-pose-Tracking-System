@@ -17,7 +17,7 @@ clear;
 close all;
 
 % Read the data as floating-point numbers
-Data = load('Test1B.txt');
+Data = load('Test2Data.txt');
 
 % Define x axis data
 T = linspace(1, length(Data), length(Data));
