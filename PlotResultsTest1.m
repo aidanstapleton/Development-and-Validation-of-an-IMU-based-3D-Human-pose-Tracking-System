@@ -1,17 +1,21 @@
-% AMME4112 - Thesis B
+%
+% IMU-Based 3D Human Pose Tracking System
 %
 % Author: Aidan Stapleton
-% Date: 012/09/2023
 %
+% Date: 03/10/2023
+%
+% Experiment 1: Elevation of the left arm from beside the
+% body to above the head and back again, pausing at 8
+% points of interest. The X and Z component of the left
+% wrist position is tracked and compared with 
+% stereo vision ground truth data.
 
 % Clear the workspace and command window
 cla;
 clc;
 clear;
 close all;
-
-% Validate data from the right arm moving from the initial position to
-% directly infront of their body with their thumb pointing left.
 
 % Read the data as floating-point numbers
 Data = load('Test1A.txt');
@@ -22,11 +26,11 @@ T = linspace(1, length(Data), length(Data));
 % Calculate the timestamps for the left wrist X data
 T_Mid = 170;
 
+% Define the x-axis data for the first 8 points (T_gt_1), 
+% last 8 points (T_gt_2), and all 15 points (T_gt).
 T1_Offset = 10;
 T_gt_1 = linspace(1, T_Mid, 8);
 T_gt_1 = [T_gt_1(1), T_gt_1(2:end-2) + T1_Offset, T_gt_1(end-1)+ T1_Offset/2, T_Mid];
-
-
 T_gt_2 = linspace(T_Mid, length(Data), 8);
 T_gt = [T_gt_1, T_gt_2(2:end)];
 
@@ -70,32 +74,22 @@ SVGroundTruthZ = [SVZPoint1To8 flip(SVZPoint1To8(1:end-1))];
 GroundTruthX = [GroundTruthXPoint1To8 flip(GroundTruthXPoint1To8(1:end-1))];
 GroundTruthY = [GroundTruthYPoint1To8 flip(GroundTruthYPoint1To8(1:end-1))];
 GroundTruthZ = [GroundTruthZPoint1To8 flip(GroundTruthZPoint1To8(1:end-1))];
-% For the current set of data 
 
 % Split the data into X, Y and Z
 DataX = Data(:, 1);
 DataY = Data(:, 2);
 DataZ = Data(:, 3);
 
-% Point matched extracted data
-%MatchedX = [-0.7, -0.7025, -0.6931, -0.6316, -0.5076, -0.4142, -0.2999, -0.1476, -0.2176, -0.492, -0.545, -0.6405, -0.685, -0.6955, -0.7013];
-%MatchedZ = [0.15, 0.2612, 0.3803, 0.5447, 0.6768, 0.7431, 0.802, 0.8063, 0.7686, 0.6917, 0.6507, 0.5338, 0.3955, 0.2824, 0.1751];
-
 % Offset coordinate frame in the Y direction to align with
 % ground truth coordinate frame
 DataY = DataY + 0.03;
-
-% Calculate the errors for X, Y and Z
-%ErrorX = MatchedX - SVGroundTruthX;
-%ErrorZ = MatchedZ - SVGroundTruthZ;
-
-% Calculate the accuracy for X
 
 % Get the raw data at each ground truth time step
 DataX_Aligned = DataX(round(T_gt), :);
 DataZ_Aligned = DataZ(round(T_gt), :);
 
-% Get precision
+% Calculate the X precision for the first 7 points where
+% two measurements are taken
 for i = 1:7
     M1 = DataX_Aligned(i);
     M2 = DataX_Aligned(end-i+1);
@@ -104,6 +98,8 @@ for i = 1:7
     PrecisionX(i) = (abs(M1-Mean) + abs(M2-Mean))/2;
 end
 
+% Calculate the Z precision for the first 7 points where
+% two measurements are taken
 for i = 1:7
     M1 = DataZ_Aligned(i);
     M2 = DataZ_Aligned(end-i+1);
@@ -112,6 +108,7 @@ for i = 1:7
     PrecisionZ(i) = (abs(M1-Mean) + abs(M2-Mean))/2;
 end
 
+% Calculate the average precision in each axis
 AvgPrecisionX = sum(PrecisionX)/7;
 AvgPrecisionZ = sum(PrecisionZ)/7;
 
@@ -150,7 +147,6 @@ blue = sscanf(str(2:end),'%2x%2x%2x',[1 3])/255;
 figure;
 hold on;
 plot(T, DataX, '-o', 'Color', blue);
-%plot(T_gt, GroundTruthX, '-o', 'Color', green);
 plot(T_gt, SVGroundTruthX, '-o', 'Color', red);
 grid on;
 title("Left Wrist Position X");
@@ -162,7 +158,6 @@ legend('Left Wrist Position X', 'Ground Truth X (Stereo Vision)');
 figure;
 hold on;
 plot(T, DataZ, '-o', 'Color', blue);
-%plot(T_gt, GroundTruthZ, '-o', 'Color', 'g');
 plot(T_gt, SVGroundTruthZ, '-o', 'Color', red);
 grid on;
 title("Left Wrist Position Z");
@@ -177,7 +172,6 @@ grid on;
 title("Left Wrist X Position Error");
 xlabel('Data Sample');
 ylabel('Left Wrist position error X (%)');
-%ylim([-0.2 0.2]);
 legend('Error X (%)');
 
 % Plot left wrist error Z
@@ -187,6 +181,5 @@ grid on;
 title("Left Wrist Z Position Error");
 xlabel('Data Sample');
 ylabel('Left Wrist position error Z (%)');
-%ylim([-0.2 0.2]);
 legend('Error Z (%)');
 
