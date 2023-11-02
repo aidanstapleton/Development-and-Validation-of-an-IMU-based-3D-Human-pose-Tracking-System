@@ -1,8 +1,12 @@
-% Stereo vision validation of an IMU-based 3D human pose
-% tracking system.
+%
+% IMU-Based 3D Human Pose Tracking System
 %
 % Author: Aidan Stapleton
-% Date: 05/10/2023
+%
+% Date: 03/10/2023
+%
+% Stereo vision validation of an IMU-based 3D human pose
+% tracking system.
 %
 
 % Clear the workspace and command window
@@ -11,7 +15,7 @@ clc;
 close all;
 clear all;
 
-% Get the stereo parameters for test 1A and test 1B
+% Get the stereo parameters for the current experiment(s)
 StereoParams = load('stereoParamsTest2_3_2.mat');
 StereoParams = StereoParams.stereoParams;
 
@@ -40,34 +44,28 @@ im2 = rgb2gray(im2);
 ContrastedPoints1 = adapthisteq(im1);
 ContrastedPoints2 = adapthisteq(im2);
 
+% Sharpen the images to detect more/less features
 Radius = 10;
 Amount = 1.8;
 ContrastedPoints1 = imsharpen(ContrastedPoints1, 'Radius', Radius, 'Amount', Amount);
 ContrastedPoints2 = imsharpen(ContrastedPoints2, 'Radius', Radius, 'Amount', Amount);
 
-% SURF or Harris
-SURForHarris = 0;
-
 % Harris parameters
 MinQuality = 0.0001;
 FilterSize = 3;
 
-% Compute a matched set of SURF features across two images
-%Points1SURF = detectSURFFeatures(ContrastedPoints1, 'ROI', [230, 260, 190, 260]);
-%Points2SURF = detectSURFFeatures(ContrastedPoints2, 'ROI', [1, 1, size(im2, 2)/3, size(im2, 1)]);
+% Compute a matched set of Harris features across two images
 ROISize = [100 100];
 LeftImageJointPosition = [721, 588];
 RightImageJointPosition = [644, 619];
 
+% Define the ROIs for the left and right image
 LeftROI = [LeftImageJointPosition(1)-ROISize(1)/2, LeftImageJointPosition(2)-ROISize(2)/2, ROISize(1), ROISize(2)];
 RightROI = [RightImageJointPosition(1)-ROISize(1)/2, RightImageJointPosition(2)-ROISize(2)/2, ROISize(1), ROISize(2)];
 
 Points1Harris = detectHarrisFeatures(ContrastedPoints1, 'ROI', LeftROI, 'MinQuality', MinQuality, 'FilterSize', FilterSize);
 Points2Harris = detectHarrisFeatures(ContrastedPoints2, 'ROI', RightROI, 'MinQuality', MinQuality, 'FilterSize', FilterSize);
   
-%Points1 = Points1SURF;
-%Points2 = Points2SURF;
-
 Points1 = Points1Harris;
 Points2 = Points2Harris;
 
@@ -77,6 +75,7 @@ Points2 = Points2Harris;
 % Calculate the corresponding pair matches based on descriptors
 MatchThreshold = 40;
 
+% Extract matched Harris corner points
 MatchedPairs = matchFeatures(Descriptors1, Descriptors2, 'MatchThreshold', MatchThreshold);
 Points1Matched = Points1(MatchedPairs(:, 1), :);
 Points2Matched = Points2(MatchedPairs(:, 2), :);
